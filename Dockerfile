@@ -1,7 +1,7 @@
 FROM alpine:3.8
 
 COPY docker /tmp/docker
-ADD https://downloads.sourceforge.net/project/davmail/davmail/4.9.0/davmail-4.9.0-2652.zip /tmp/davmail/davmail.zip
+ADD https://downloads.sourceforge.net/project/davmail/davmail/5.0.0/davmail-5.0.0-2801.zip /tmp/davmail/davmail.zip
 
 RUN cd /tmp/davmail && unzip davmail.zip && rm davmail.zip && \
   install -dm755 /etc/davmail && \
