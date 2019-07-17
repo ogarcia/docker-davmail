@@ -1,4 +1,4 @@
-FROM alpine:3.8
+FROM alpine:3.10
 
 COPY docker /tmp/docker
 ADD https://downloads.sourceforge.net/project/davmail/davmail/5.2.0/davmail-5.2.0-2961.zip /tmp/davmail/davmail.zip
