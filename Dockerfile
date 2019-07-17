@@ -13,7 +13,7 @@ RUN cd /tmp/davmail && unzip davmail.zip && rm davmail.zip && \
   install -m644 /tmp/docker/davmail.properties /etc/davmail/davmail.properties && \
   ln -s /usr/share/java/davmail/davmail.sh /usr/bin/davmail && \
   apk -U --no-progress upgrade && \
-  apk --no-progress add openjdk8-jre-base && \
+  apk --no-progress add openjdk8-jre-base nss && \
   adduser -S -D -H -h / -s /sbin/nologin -G users -g davmail davmail && \
   chown davmail:users /var/log/davmail && \
   rm -rf /root/.ash_history /root/.cache /tmp/* /var/cache/apk/*
