@@ -1,6 +1,6 @@
-# DavMail docker [![Build Status](https://travis-ci.org/ogarcia/docker-davmail.svg?branch=master)](https://travis-ci.org/ogarcia/docker-davmail)
+# DavMail docker [![CircleCI](https://circleci.com/gh/ogarcia/docker-davmail.svg?style=svg)](https://circleci.com/gh/ogarcia/docker-davmail)
 
-(c) 2018 Óscar García Amor
+(c) 2018-2020 Óscar García Amor
 
 Redistribution, modifications and pull requests are welcomed under the terms
 of GPLv3 license.
@@ -12,11 +12,12 @@ from the internet or behind a firewall through Outlook Web Access.
 This docker packages **DavMail** under [Alpine Linux][2], a lightweight
 Linux distribution.
 
-Visit [Docker Hub][3] to see all available tags.
+Visit [Docker Hub][3] or [Quay][4] to see all available tags.
 
 [1]: http://davmail.sourceforge.net/
 [2]: https://alpinelinux.org/
 [3]: https://hub.docker.com/r/connectical/davmail/
+[4]: https://quay.io/repository/connectical/davmail/
 
 ## Run
 
@@ -33,9 +34,9 @@ docker run -d \
   connectical/davmail
 ```
 
-Default config points to [Office 365 EWS][4].
+Default config points to [Office 365 EWS][5].
 
-[4]: https://outlook.office365.com/EWS/Exchange.asmx
+[5]: https://outlook.office365.com/EWS/Exchange.asmx
 
 ## Volumes
 

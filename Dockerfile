@@ -1,7 +1,9 @@
-FROM alpine:3.10
-
-COPY docker /tmp/docker
-ADD https://downloads.sourceforge.net/project/davmail/davmail/5.4.0/davmail-5.4.0-3135.zip /tmp/davmail/davmail.zip
+ARG ALPINE_VERSION
+FROM alpine:${ALPINE_VERSION}
+ARG DAVMAIL_VERSION
+ARG DAVMAIL_REVISION
+ADD https://downloads.sourceforge.net/project/davmail/davmail/${DAVMAIL_VERSION}/davmail-${DAVMAIL_VERSION}-${DAVMAIL_REVISION}.zip /tmp/davmail/davmail.zip
+COPY .circleci/docker /tmp/docker
 
 RUN cd /tmp/davmail && unzip davmail.zip && rm davmail.zip && \
   install -dm755 /etc/davmail && \
@@ -23,7 +25,5 @@ EXPOSE 1143
 EXPOSE 1389
 EXPOSE 1110
 EXPOSE 1025
-
 USER davmail
-
 ENTRYPOINT [ "/usr/bin/davmail", "/etc/davmail/davmail.properties" ]
