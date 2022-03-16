@@ -76,3 +76,24 @@ docker run -t -i --rm \
 ```
 
 Please note that the `--rm` modifier destroy the docker after shell exit.
+
+
+## MFA Office365
+
+The headless version of davmail does not yet support a shell based authentication 
+process to log in with a second factor.
+
+A workaround is to install the GUI enabled davmail on a desktop and authenticate with 
+the `O365Interactive` method. After successful authentication, it is possible to extract the
+`davmail.oauth.<user@email.tld>.refreshToken={AES}...` from the `.davmail.properties` file.
+
+Copy this key to your server configuration and set the connection mode to
+
+```
+davmail.enableEws=EWS
+davmail.authenticator=davmail.exchange.auth.O365Authenticator
+
+davmail.oauth.<user@email.tld>.refreshToken={AES}...
+```
+
+When a client connects to the davmail bridge, the password is used to decrypt the authentication token.
