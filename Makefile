@@ -30,7 +30,7 @@ docker-test:
 	docker image inspect $(DOCKER_ORGANIZATION)/$(DOCKER_IMAGE)
 	docker run --name $(DOCKER_IMAGE) -d -p 1025:1025 -p 1389:1389 -p 1110:1110 -p 1143:1143 -p 1080:1080 $(DOCKER_ORGANIZATION)/$(DOCKER_IMAGE)
 	sleep 5
-	netstat -puntal | egrep "1025|1389|1110|1143|1080"
+	ss -ltpn | egrep "1025|1389|1110|1143|1080"
 	docker kill $(DOCKER_IMAGE)
 	docker rm $(DOCKER_IMAGE)
 
