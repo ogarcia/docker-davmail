@@ -1,4 +1,4 @@
-# DavMail docker [![CircleCI](https://circleci.com/gh/ogarcia/docker-davmail.svg?style=svg)](https://circleci.com/gh/ogarcia/docker-davmail)
+# DavMail container [![CircleCI](https://circleci.com/gh/ogarcia/docker-davmail.svg?style=svg)](https://circleci.com/gh/ogarcia/docker-davmail)
 
 (c) 2018-2023 Óscar García Amor
 
@@ -9,16 +9,15 @@ of GPLv3 license.
 allowing users to use any mail/calendar client with an Exchange server, even
 from the internet or behind a firewall through Outlook Web Access.
 
-This docker packages **DavMail** under [Alpine Linux][2], a lightweight
+This container packages **DavMail** under [Alpine Linux][2], a lightweight
 Linux distribution.
 
-Visit [Docker Hub][3], [Quay][4] or [GitHub][5] to see all available tags.
+Visit [Quay][3] or [GitHub][4] to see all available tags.
 
 [1]: http://davmail.sourceforge.net/
 [2]: https://alpinelinux.org/
-[3]: https://hub.docker.com/r/connectical/davmail/
-[4]: https://quay.io/repository/connectical/davmail/
-[5]: https://github.com/orgs/connectical/packages/container/package/davmail
+[3]: https://quay.io/repository/connectical/davmail/
+[4]: https://github.com/orgs/connectical/packages/container/package/davmail
 
 ## Run
 
@@ -32,12 +31,12 @@ docker run -d \
   -p 1110:1110 \
   -p 1143:1143 \
   -p 1080:1080 \
-  connectical/davmail
+  ghcr.io/connectical/davmail
 ```
 
-Default config points to [Office 365 EWS][6].
+Default config points to [Office 365 EWS][5].
 
-[6]: https://outlook.office365.com/EWS/Exchange.asmx
+[5]: https://outlook.office365.com/EWS/Exchange.asmx
 
 ## Volumes
 
@@ -48,7 +47,7 @@ mount it as a volume.
 docker run -d \
   --name=davmail \
   -v /my/own/davmail.properties:/etc/davmail/davmail.properties \
-  connectical/davmail
+  ghcr.io/connectical/davmail
 ```
 
 In the same way you can configure a volume to persistent store the logs.
@@ -57,12 +56,12 @@ In the same way you can configure a volume to persistent store the logs.
 docker run -d \
   --name=davmail \
   -v /my/own/davmail/logdir:/var/log/davmail
-  connectical/davmail
+  ghcr.io/connectical/davmail
 ```
 
 Take note that DavMail is running by `davmail` user (*UID 100*) inside
-Docker. You must set proper permissions in your external volume to allow to
-this user to write on it.
+container. You must set proper permissions in your external volume to allow
+to this user to write on it.
 
 ## Shell run
 
@@ -73,7 +72,7 @@ docker run -t -i --rm \
   --name=davmail \
   --user=root \
   --entrypoint=/bin/sh \
-  connectical/davmail
+  ghcr.io/connectical/davmail
 ```
 
-Please note that the `--rm` modifier destroy the docker after shell exit.
+Please note that the `--rm` modifier destroy the container after shell exit.

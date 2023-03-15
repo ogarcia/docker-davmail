@@ -3,7 +3,7 @@ FROM alpine:${ALPINE_VERSION}
 ARG DAVMAIL_VERSION
 ARG DAVMAIL_REVISION
 ADD https://downloads.sourceforge.net/project/davmail/davmail/${DAVMAIL_VERSION}/davmail-${DAVMAIL_VERSION}-${DAVMAIL_REVISION}.zip /tmp/davmail/davmail.zip
-COPY .circleci/docker /tmp/docker
+COPY .circleci/container /tmp/container
 
 RUN cd /tmp/davmail && unzip davmail.zip && rm davmail.zip && \
   install -dm755 /etc/davmail && \
@@ -11,8 +11,8 @@ RUN cd /tmp/davmail && unzip davmail.zip && rm davmail.zip && \
   install -dm755 /var/log/davmail && \
   install -m644 davmail.jar /usr/share/java/davmail/davmail.jar && \
   install -m644 lib/* /usr/share/java/davmail/lib && \
-  install -m755 /tmp/docker/davmail.sh /usr/share/java/davmail/davmail.sh && \
-  install -m644 /tmp/docker/davmail.properties /etc/davmail/davmail.properties && \
+  install -m755 /tmp/container/davmail.sh /usr/share/java/davmail/davmail.sh && \
+  install -m644 /tmp/container/davmail.properties /etc/davmail/davmail.properties && \
   ln -s /usr/share/java/davmail/davmail.sh /usr/bin/davmail && \
   apk -U --no-progress upgrade && \
   apk --no-progress add openjdk8-jre-base nss && \
