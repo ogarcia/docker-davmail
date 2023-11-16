@@ -2,7 +2,7 @@ ARG ALPINE_VERSION
 FROM alpine:${ALPINE_VERSION}
 ARG DAVMAIL_VERSION
 ARG DAVMAIL_REVISION
-ADD https://downloads.sourceforge.net/project/davmail/davmail/${DAVMAIL_VERSION}/davmail-${DAVMAIL_VERSION}-${DAVMAIL_REVISION}.zip /tmp/davmail/davmail.zip
+ADD https://sourceforge.net/projects/davmail/files/davmail/${DAVMAIL_VERSION}/davmail-${DAVMAIL_VERSION}-${DAVMAIL_REVISION}.zip/download /tmp/davmail/davmail.zip
 COPY .circleci/container /tmp/container
 
 RUN cd /tmp/davmail && unzip davmail.zip && rm davmail.zip && \
