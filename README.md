@@ -1,6 +1,6 @@
 # DavMail container [![CircleCI](https://circleci.com/gh/ogarcia/docker-davmail.svg?style=svg)](https://circleci.com/gh/ogarcia/docker-davmail)
 
-(c) 2018-2023 Óscar García Amor
+(c) 2018-2024 Óscar García Amor
 
 Redistribution, modifications and pull requests are welcomed under the terms
 of GPLv3 license.
