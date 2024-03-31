@@ -1,5 +1,5 @@
 ARG ALPINE_VERSION
-FROM alpine:${ALPINE_VERSION}
+FROM docker.io/alpine:${ALPINE_VERSION}
 ARG DAVMAIL_VERSION
 ARG DAVMAIL_REVISION
 ADD https://sourceforge.net/projects/davmail/files/davmail/${DAVMAIL_VERSION}/davmail-${DAVMAIL_VERSION}-${DAVMAIL_REVISION}.zip/download /tmp/davmail/davmail.zip
