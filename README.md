@@ -1,29 +1,34 @@
-# DavMail container [![CircleCI](https://circleci.com/gh/ogarcia/docker-davmail.svg?style=svg)](https://circleci.com/gh/ogarcia/docker-davmail)
+# DavMail container
+
+[![forthebadge](https://forthebadge.com/images/badges/built-with-resentment.svg)](https://forthebadge.com)
+[![forthebadge](https://forthebadge.com/images/badges/its-not-a-lie-if-you-believe-it.svg)](https://forthebadge.com)
+[![forthebadge](https://forthebadge.com/images/badges/contains-technical-debt.svg)](https://forthebadge.com)
 
 (c) 2018-2024 Óscar García Amor
 
 Redistribution, modifications and pull requests are welcomed under the terms
 of GPLv3 license.
 
-[DavMail][1] is a POP/IMAP/SMTP/Caldav/Carddav/LDAP exchange gateway
+[DavMail][dm] is a POP/IMAP/SMTP/Caldav/Carddav/LDAP exchange gateway
 allowing users to use any mail/calendar client with an Exchange server, even
 from the internet or behind a firewall through Outlook Web Access.
 
-This container packages **DavMail** under [Alpine Linux][2], a lightweight
+This container packages **DavMail** under [Alpine Linux][al], a lightweight
 Linux distribution.
 
-Visit [Quay][3] or [GitHub][4] to see all available tags.
+Visit [Quay][qu] or [GitLab][gl] to see all available tags.
 
-[1]: http://davmail.sourceforge.net/
-[2]: https://alpinelinux.org/
-[3]: https://quay.io/repository/connectical/davmail
-[4]: https://github.com/orgs/connectical/packages/container/package/davmail
+[dm]: http://davmail.sourceforge.net/
+[al]: https://alpinelinux.org/
+[qu]: https://quay.io/repository/connectical/davmail
+[gl]: https://gitlab.com/connectical/container/davmail/container_registry
 
 ## Run
 
 To run this container, simply exec.
 
 ```sh
+alias docker="podman" # If you are using podman
 docker run -d \
   --name=davmail \
   -p 1025:1025 \
@@ -31,12 +36,12 @@ docker run -d \
   -p 1110:1110 \
   -p 1143:1143 \
   -p 1080:1080 \
-  ghcr.io/connectical/davmail
+  registry.gitlab.com/connectical/container/davmail
 ```
 
-Default config points to [Office 365 EWS][5].
+Default config points to [Office 365 EWS][o365].
 
-[5]: https://outlook.office365.com/EWS/Exchange.asmx
+[o365]: https://outlook.office365.com/EWS/Exchange.asmx
 
 ## Volumes
 
@@ -44,19 +49,21 @@ If you want reconfigure DavMail with your own `davmail.properties` you can
 mount it as a volume.
 
 ```sh
+alias docker="podman" # If you are using podman
 docker run -d \
   --name=davmail \
   -v /my/own/davmail.properties:/etc/davmail/davmail.properties \
-  ghcr.io/connectical/davmail
+  registry.gitlab.com/connectical/container/davmail
 ```
 
 In the same way you can configure a volume to persistent store the logs.
 
 ```sh
+alias docker="podman" # If you are using podman
 docker run -d \
   --name=davmail \
   -v /my/own/davmail/logdir:/var/log/davmail
-  ghcr.io/connectical/davmail
+  registry.gitlab.com/connectical/container/davmail
 ```
 
 Take note that DavMail is running by `davmail` user (*UID 100*) inside
@@ -68,11 +75,12 @@ to this user to write on it.
 If you can run a shell instead DavMail, simply do.
 
 ```sh
+alias docker="podman" # If you are using podman
 docker run -t -i --rm \
   --name=davmail \
   --user=root \
   --entrypoint=/bin/sh \
-  ghcr.io/connectical/davmail
+  registry.gitlab.com/connectical/container/davmail
 ```
 
 Please note that the `--rm` modifier destroy the container after shell exit.
