@@ -1,6 +1,14 @@
 variables:
   BUILDX_NO_DEFAULT_ATTESTATIONS: 1
   QUAY_REGISTRY_IMAGE: quay.io/connectical/davmail
+  # Set to "true" to build even if versions have not changed
+  FORCE_BUILD: "false"
+
+workflow:
+  rules:
+    - if: $CI_COMMIT_TAG
+      when: never
+    - if: $CI_COMMIT_REF_PROTECTED == "true"
 
 stages:
   - Container
@@ -10,43 +18,48 @@ Build and push container image:
   image: docker
   services:
     - docker:dind
+  before_script:
+    - apk --no-cache add curl jq
   script:
-    - docker context create builder
-    - docker buildx create builder --use
     - docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
     - docker login -u ${QUAY_USERNAME} -p ${QUAY_PASSWORD} quay.io
-    - source .env
+    # Base version (before upgrade, it must exist as a tag in Docker Hub) and
+    # the list of packages that the final image would have if built now
+    - BASE=$(docker run --rm docker.io/alpine:latest sh -c 'cat /etc/alpine-release && apk -U -q --no-progress upgrade >/dev/null && apk -q --no-progress add openjdk8-jre-base nss >/dev/null && apk info -v | sort')
+    - ALPINE_VERSION=$(echo "${BASE}" | awk 'NR == 1')
+    - PACKAGES_DIGEST=sha256:$(echo "${BASE}" | tail -n +2 | sha256sum | cut -d' ' -f1)
+    # Latest davmail zip published in SourceForge (files are sorted by date)
+    - DAVMAIL_RELEASE=$(curl -fsSL 'https://sourceforge.net/projects/davmail/rss?path=/davmail' | sed -n 's|.*<title><!\[CDATA\[/davmail/[0-9.]*/davmail-\([0-9.]*\)-\([0-9]*\)\.zip\]\]></title>.*|\1 \2|p')
+    - DAVMAIL_VERSION=$(echo "${DAVMAIL_RELEASE}" | awk 'NR == 1 { print $1 }')
+    - DAVMAIL_REVISION=$(echo "${DAVMAIL_RELEASE}" | awk 'NR == 1 { print $2 }')
+    - test -n "${ALPINE_VERSION}" && test -n "${DAVMAIL_VERSION}" && test -n "${DAVMAIL_REVISION}"
+    - echo "Upstream versions -> davmail ${DAVMAIL_VERSION}-${DAVMAIL_REVISION}, alpine ${ALPINE_VERSION}, packages ${PACKAGES_DIGEST}"
+    # Get versions of the published image (empty if not exists or not labeled)
+    - PUBLISHED=$(docker buildx imagetools inspect --format '{{json .Image}}' ${CI_REGISTRY_IMAGE}:latest 2>/dev/null | jq -c '[.. | objects | select(has("Labels")) | .Labels][0] // {}' 2>/dev/null || true)
+    - PUBLISHED_DAVMAIL_VERSION=$(echo "${PUBLISHED}" | jq -r '.["org.opencontainers.image.version"] // empty' 2>/dev/null || true)
+    - PUBLISHED_PACKAGES_DIGEST=$(echo "${PUBLISHED}" | jq -r '.["com.connectical.packages.digest"] // empty' 2>/dev/null || true)
+    - echo "Published versions -> davmail ${PUBLISHED_DAVMAIL_VERSION:-none}, packages ${PUBLISHED_PACKAGES_DIGEST:-none}"
+    # Only scheduled pipelines are allowed to skip the build
     - |
-      docker buildx build --push \
-        --platform linux/amd64,linux/arm64,linux/arm/v7 \
-        --build-arg ALPINE_VERSION=${ALPINE_VERSION} \
-        --build-arg DAVMAIL_VERSION=${DAVMAIL_VERSION} \
-        --build-arg DAVMAIL_REVISION=${DAVMAIL_REVISION} \
-        --tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_NAME} \
-        --tag ${QUAY_REGISTRY_IMAGE}:${CI_COMMIT_REF_NAME} .
-  rules:
-    - if: $CI_COMMIT_TAG == null && $CI_COMMIT_REF_PROTECTED == "true"
-
-Build and push tagged container image:
-  stage: Container
-  image: docker
-  services:
-    - docker:dind
-  script:
+      if [ "${CI_PIPELINE_SOURCE}" = "schedule" ] && [ "${FORCE_BUILD}" != "true" ] \
+        && [ "${DAVMAIL_VERSION}-${DAVMAIL_REVISION}" = "${PUBLISHED_DAVMAIL_VERSION}" ] \
+        && [ "${PACKAGES_DIGEST}" = "${PUBLISHED_PACKAGES_DIGEST}" ]; then
+        echo "No changes in davmail or alpine, skipping build"
+        exit 0
+      fi
+    - IMAGE_TAG=${DAVMAIL_VERSION}-alpine${ALPINE_VERSION}
     - docker context create builder
     - docker buildx create builder --use
-    - docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
-    - docker login -u ${QUAY_USERNAME} -p ${QUAY_PASSWORD} quay.io
-    - source .env
-    - |
-      docker buildx build --push \
-        --platform linux/amd64,linux/arm64,linux/arm/v7 \
-        --build-arg ALPINE_VERSION=${ALPINE_VERSION} \
-        --build-arg DAVMAIL_VERSION=${DAVMAIL_VERSION} \
-        --build-arg DAVMAIL_REVISION=${DAVMAIL_REVISION} \
-        --tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG} \
-        --tag ${CI_REGISTRY_IMAGE}:latest \
-        --tag ${QUAY_REGISTRY_IMAGE}:${CI_COMMIT_TAG} \
-        --tag ${QUAY_REGISTRY_IMAGE}:latest .
-  rules:
-    - if: $CI_COMMIT_TAG
+    - >
+      docker buildx build --push
+      --platform linux/amd64,linux/arm64,linux/arm/v7
+      --build-arg ALPINE_VERSION=${ALPINE_VERSION}
+      --build-arg DAVMAIL_VERSION=${DAVMAIL_VERSION}
+      --build-arg DAVMAIL_REVISION=${DAVMAIL_REVISION}
+      --label org.opencontainers.image.version=${DAVMAIL_VERSION}-${DAVMAIL_REVISION}
+      --label org.opencontainers.image.base.name=docker.io/alpine:${ALPINE_VERSION}
+      --label com.connectical.packages.digest=${PACKAGES_DIGEST}
+      --tag ${CI_REGISTRY_IMAGE}:${IMAGE_TAG}
+      --tag ${CI_REGISTRY_IMAGE}:latest
+      --tag ${QUAY_REGISTRY_IMAGE}:${IMAGE_TAG}
+      --tag ${QUAY_REGISTRY_IMAGE}:latest .
